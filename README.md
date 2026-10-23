@@ -1,46 +1,105 @@
-# Bash-Scripting
+# Bash Scripts
 
-Every script is standalone, starts with #!/bin/bash, and is already executable.
+Every script is standalone, starts with `#!/bin/bash`, and is executable.
 
-chmod +x *.sh          # if the executable bit is lost in transit
+## Quick Start
+
+If the executable permission is lost during download or cloning, run:
+
+```bash
+chmod +x *.sh
+```
+
+Run a script by passing the required arguments:
+
+```bash
 ./01-even-odd.sh 7
+```
 
-# logic/ — 28 interview logic programs
+## Script Categories
 
-Screening-round classics. Each takes its input as an argument, never hardcoded,
-and each ends with the one-liner version commented out for when the interviewer
-asks you to shorten it.
+### `logic/` — 28 Interview Logic Programs
 
+A collection of classic screening-round programming problems implemented in Bash.
+
+- Each script accepts input through command-line arguments instead of hardcoded values.
+- Each script includes a commented, one-line alternative for interviewers who ask for a shorter solution.
+
+**Examples:**
+
+```bash
 ./01-even-odd.sh 7
 ./05-fibonacci-series.sh 10
 ./16-gcd-lcm.sh 12 18
 ./21-second-largest.sh 5 9 2 9 7
+```
 
-# devops/ — 14 production scripts
+### `devops/` — 14 Production-Oriented Scripts
 
-The kind that actually run in a company: monitoring, backup, deployment, Jenkins,
-Kubernetes. These start with set -Eeuo pipefail and are written to be re-runnable.
+Practical DevOps automation scripts covering monitoring, backups, deployments, Jenkins, and Kubernetes.
 
-# Read before running. Several touch real infrastructure. Placeholders to change:
+These scripts use `set -Eeuo pipefail` for stricter error handling and are designed to be safe to rerun where applicable.
 
-# Script	                  Change this first
-01-disk-monitor	          SNS_TOPIC — the ARN is a dummy
-03-db-backup-s3	          S3_BUCKET, and put the DB password in ~/.my.cnf (chmod 600)
-05-deploy	                APP, HEALTH_URL, and the /opt/$APP layout
-09-render-config	        the SSM path /myapp/$ENVIRONMENT/ and the template path
-10-rolling-restart	      TARGET_GROUP_ARN
-12-k8s-rollout	          NAMESPACE, DEPLOYMENT, CONTAINER
+> [!WARNING]
+> **Review every script before running it.** Some scripts interact with real infrastructure and may delete resources, restart services, or modify deployments. Test them in a lab environment first.
 
-Scripts 02, 10, 11 and 12 delete or restart things. Try them in a lab first.
+#### Configuration Required
 
-# Environment variables
-Most scripts read their settings from the environment so the same file works in
-dev, stage and prod:
+Update the following placeholders before executing the corresponding scripts.
 
+| Script | Placeholders / Action Required |
+|---|---|
+| `01-disk-monitor.sh` | Set `SNS_TOPIC` to your actual SNS topic ARN. The current ARN is a dummy value. |
+| `03-db-backup-s3.sh` | Configure `S3_BUCKET` and store database credentials in `~/.my.cnf` with permissions set to `600`. |
+| `05-deploy.sh` | Configure `APP`, `HEALTH_URL`, and the expected `/opt/$APP` directory layout. |
+| `09-render-config.sh` | Update the SSM parameter path `/myapp/$ENVIRONMENT/` and the template path. |
+| `10-rolling-restart.sh` | Configure `TARGET_GROUP_ARN`. |
+| `12-k8s-rollout.sh` | Configure `NAMESPACE`, `DEPLOYMENT`, and `CONTAINER`. |
+
+**Important:** Scripts `02`, `10`, `11`, and `12` perform deletion or restart operations. Inspect their behavior and validate the target resources before execution.
+
+## Environment Variables
+
+Most scripts read configuration from environment variables, allowing the same script to be used across development, staging, and production environments without modifying the source code.
+
+**Examples:**
+
+```bash
+# Disk monitoring
 THRESHOLD=90 ./01-disk-monitor.sh
-DB_HOST=db01 DB_NAME=orders ./03-db-backup-s3.sh
-NAMESPACE=prod DEPLOYMENT=api ./12-k8s-rollout.sh
 
-# Dependencies
-aws CLI, docker, kubectl, mysqldump, openssl, jq, lsof — depending on
-the script. Each fails with a clear message if its tool is missing.
+# Database backup
+DB_HOST=db01 DB_NAME=orders ./03-db-backup-s3.sh
+
+# Kubernetes rollout
+NAMESPACE=prod DEPLOYMENT=api ./12-k8s-rollout.sh
+```
+
+Set the variables required by each script before running it. Refer to the script source for additional configuration requirements and defaults.
+
+## Dependencies
+
+Dependencies vary by script.
+
+Depending on the task, you may need:
+
+- **Bash** — script execution.
+- **AWS CLI** — AWS services, S3 backups, SNS notifications, and Systems Manager Parameter Store.
+- **kubectl** — Kubernetes deployment and rollout operations.
+- **Jenkins** — Jenkins-related automation, where applicable.
+- **Standard Linux utilities** — tools used for monitoring, file operations, and deployment tasks.
+
+Install and configure only the dependencies required by the scripts you intend to run. Verify that AWS credentials, IAM permissions, Kubernetes contexts, and other required access settings point to the correct environment.
+
+## Best Practices
+
+- Review scripts before executing them, especially those that modify infrastructure.
+- Avoid hardcoding passwords, access keys, or other secrets.
+- Use least-privilege IAM permissions.
+- Validate environment variables and target resources before production execution.
+- Test changes in development or staging first.
+- Check script exit codes and logs when troubleshooting failures.
+
+---
+
+**Purpose:** A practical Bash scripting collection for Linux, DevOps automation, and technical interview preparation.
